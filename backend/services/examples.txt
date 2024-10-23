@@ -1,0 +1,11 @@
+    4. "Find customers who have made more than 5 transactions above $1,000 in the last 6 months, and display their email addresses and total transaction amounts."
+    - SELECT c.customer_id, c.first_name, c.last_name, c.email_address, COUNT(t.transaction_id) AS high_value_transactions, SUM(t.transaction_amount) AS total_amount FROM transactions t JOIN customers c ON t.customer_id = c.customer_id WHERE t.transaction_amount > 1000 AND t.transaction_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) GROUP BY c.customer_id, c.first_name, c.last_name, c.email_address HAVING high_value_transactions > 5 ORDER BY total_amount DESC;
+
+    5. "Find customers who have made transactions using multiple different account types, and list their total transaction amounts along with the account types they used.
+    - WITH AccountTypesPerCustomer AS (SELECT customer_id, COUNT(DISTINCT account_type) AS unique_account_types FROM accounts GROUP BY customer_id HAVING unique_account_types > 1) SELECT c.customer_id, c.first_name, c.last_name, a.account_type, SUM(t.transaction_amount) AS total_transaction_amount FROM customers c JOIN accounts a ON c.customer_id = a.customer_id JOIN transactions t ON a.account_id = t.account_id WHERE c.customer_id IN (SELECT customer_id FROM AccountTypesPerCustomer) GROUP BY c.customer_id, a.account_type ORDER BY total_transaction_amount DESC;
+
+    6. "List customers who have made transactions with more than one account, showing their total transaction amount and the number of accounts they have used."
+    - SELECT c.customer_id, c.first_name, c.last_name, COUNT(DISTINCT t.account_id) AS account_count, SUM(t.transaction_amount) AS total_transaction_amount FROM customers c JOIN transactions t ON c.customer_id = t.customer_id GROUP BY c.customer_id, c.first_name, c.last_name HAVING account_count > 1;
+
+    7. "Find customers who have made at least 3 transactions in the last 6 months and display their total transaction amounts."
+    - SELECT c.customer_id, c.first_name, c.last_name, COUNT(t.transaction_id) AS transaction_count, SUM(t.transaction_amount) AS total_transaction_amount FROM customers c JOIN transactions t ON c.customer_id = t.customer_id WHERE t.transaction_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) GROUP BY c.customer_id HAVING transaction_count >= 3 ORDER BY total_transaction_amount DESC;
